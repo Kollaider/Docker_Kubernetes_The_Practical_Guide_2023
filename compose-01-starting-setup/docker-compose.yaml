@@ -1,0 +1,48 @@
+version: "3.8"
+services:
+  mongodb:
+    image: "mongo"      # --rm and -d by default
+    container_name: mongodb # compose-01-starting-setup-mongodb-1 by default (project_name-service-increment_num)
+    volumes:
+      - data:/data/db
+#    environment:
+#      - MONGO_INITDB_ROOT_USERNAME=admin
+#      MONGO_INITDB_ROOT_USERNAME: admin
+    env_file:
+      - ./env/mongo.env
+#    networks:          # create network by default
+#      - goals-net
+
+  backend:
+#    image: "goals-node"    # 1. if image exists
+#    build:                 # 2. long form, if needed point docker file
+#      context: ./backend   #    with another name (e.g. Dockerfile-dev)
+#      dockerfile: Dockerfile
+#      args:
+#        some-arg: some_val
+    build: ./backend        # 3. short form, used if build needed
+    ports:
+      - "80:80"
+    volumes:
+      - logs:/app/logs      # named volume
+      - ./backend:/app      # bind mount (used relative path instead absolute
+      - /app/node_modules   # anonymous volume
+    env_file:
+      - ./env/backend.env
+    depends_on:
+      - mongodb
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend/src:/app/src   # bind mount (relative path)
+    stdin_open: true              # let DC know that this service needs an open input connection
+    tty: true
+    depends_on:
+      - backend
+
+volumes:                # all named volumes should be specified here
+  data:
+  logs:
