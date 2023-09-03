@@ -9,3 +9,5 @@ nodejs-app-starting-setup/node_modules
 data-volumes-02-added-dockerfile/node_modules
 
 data-volumes-04-added-nodemon/.env
+
+multi-01-starting-setup/backend/node_modules
